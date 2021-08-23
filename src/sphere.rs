@@ -3,12 +3,14 @@ use crate::hit::{HitOrMiss, Hittable};
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
+/// A Sphere defined with a center point and a radius.
 pub struct Sphere {
     pub center: Vec3,
     pub r: f64,
 }
 
 impl Hittable for Sphere {
+    /// Test whether a given ray hit the sphere between times t_min and t_max.
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> HitOrMiss {
         let oc = ray.origin - self.center;
         let a = ray.direction.magnitude().powi(2);
