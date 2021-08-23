@@ -13,9 +13,9 @@ impl Hittable for Sphere {
     /// Test whether a given ray hit the sphere between times t_min and t_max.
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> HitOrMiss {
         let oc = ray.origin - self.center;
-        let a = ray.direction.magnitude().powi(2);
+        let a = ray.direction.norm();
         let h = oc.dot(&ray.direction);
-        let c = oc.magnitude().powi(2) - self.r * self.r;
+        let c = oc.norm() - self.r * self.r;
         let discriminant = h * h - a * c;
         return if discriminant < 0.0 {
             Miss
