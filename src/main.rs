@@ -7,6 +7,7 @@ use sdl2::rect::Point;
 
 use crate::camera::Camera;
 use crate::hit::{HitOrMiss, Hittable, HittableList};
+use crate::material::{Lambertian, Metal, ScatterResult, UniformScatterer};
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::Vec3;
@@ -16,6 +17,7 @@ use rand::Rng;
 mod vec3;
 mod camera;
 mod hit;
+mod material;
 mod ray;
 mod sphere;
 
@@ -25,19 +27,22 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: usize) -> Vec3 {
         return Vec3::zero();
     };
     match world.hit(ray, 0.001, f64::INFINITY) {
-        HitOrMiss::Hit { p, normal, .. } => {
+        HitOrMiss::Hit {
+            p: _,
+            normal: _,
+            scatter_result,
+            ..
+        } => {
             // Normalize ensures all components in range [0.0,1.0],
             // + [1,1,1] ensures all are in range [1.0, 2.0]
             // 0.5 * => all in range [0.5,1.0]
-            let target = p + Vec3::random_in_hemisphere(&normal);
-            0.5 * (ray_color(
-                &Ray {
-                    origin: p,
-                    direction: target - p,
-                },
-                world,
-                depth - 1,
-            ))
+            match scatter_result {
+                ScatterResult::Scattered {
+                    scattered_ray,
+                    attenuation,
+                } => attenuation * ray_color(&scattered_ray, world, depth - 1),
+                ScatterResult::Absorbed { .. } => Vec3::zero(),
+            }
         }
         HitOrMiss::Miss => {
             let unit_direction = ray.direction.normalize();
@@ -91,6 +96,34 @@ fn main() {
     canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
+    // Define our materials
+    let material_ground = Box::from(UniformScatterer::make(Vec3 {
+        x: 0.8,
+        y: 0.8,
+        z: 0.0,
+    }));
+    let material_center = Box::from(Lambertian::make(Vec3 {
+        x: 0.7,
+        y: 0.3,
+        z: 0.3,
+    }));
+    let material_left = Box::from(Metal::make(
+        Vec3 {
+            x: 0.8,
+            y: 0.8,
+            z: 0.8,
+        },
+        0.3,
+    ));
+    let material_right = Box::from(Metal::make(
+        Vec3 {
+            x: 0.8,
+            y: 0.6,
+            z: 0.2,
+        },
+        1.0,
+    ));
+
     // Set up the game world
     let mut world = HittableList { hittables: vec![] };
     world.hittables.push(Box::from(Sphere {
@@ -100,6 +133,7 @@ fn main() {
             z: -1.0,
         },
         r: 0.5,
+        material: material_center,
     }));
     world.hittables.push(Box::from(Sphere {
         center: Vec3 {
@@ -108,6 +142,25 @@ fn main() {
             z: -1.0,
         },
         r: 100.0,
+        material: material_ground,
+    }));
+    world.hittables.push(Box::from(Sphere {
+        center: Vec3 {
+            x: -1.0,
+            y: 0.0,
+            z: -1.0,
+        },
+        r: 0.5,
+        material: material_left,
+    }));
+    world.hittables.push(Box::from(Sphere {
+        center: Vec3 {
+            x: 1.0,
+            y: 0.0,
+            z: -1.0,
+        },
+        r: 0.5,
+        material: material_right,
     }));
 
     // Render with ray tracing

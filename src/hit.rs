@@ -1,4 +1,5 @@
 use crate::hit::HitOrMiss::{Hit, Miss};
+use crate::material::{Material, ScatterResult};
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
@@ -7,6 +8,7 @@ pub enum HitOrMiss {
     Hit {
         p: Vec3,
         normal: Vec3,
+        scatter_result: ScatterResult,
         t: f64,
         front_face: bool,
     },
@@ -19,18 +21,26 @@ impl HitOrMiss {
     ///
     /// This method handles detecting whether the ray is hitting the front face of the object or
     /// not.
-    pub fn hit(p: Vec3, outward_normal: Vec3, t: f64, ray: &Ray) -> HitOrMiss {
+    pub fn hit(
+        p: Vec3,
+        outward_normal: Vec3,
+        t: f64,
+        ray: &Ray,
+        material: &dyn Material,
+    ) -> HitOrMiss {
         let front_face = ray.direction.dot(&outward_normal) < 0.0;
         let normal = if front_face {
             outward_normal
         } else {
             -outward_normal
         };
+        let scatter_result = material.scatter(ray, p, normal);
         Hit {
             p,
             normal,
             t,
             front_face,
+            scatter_result,
         }
     }
 }

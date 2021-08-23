@@ -45,6 +45,11 @@ impl Vec3 {
         }
     }
 
+    pub fn near_zero(&self) -> bool {
+        const SMALL: f64 = 0.00000008;
+        self.x.abs() < SMALL && self.y.abs() < SMALL && self.z.abs() < SMALL
+    }
+
     pub fn random(min: f64, max: f64) -> Vec3 {
         let mut rng = rand::thread_rng();
         Vec3 {

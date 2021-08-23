@@ -1,5 +1,6 @@
 use crate::hit::HitOrMiss::Miss;
 use crate::hit::{HitOrMiss, Hittable};
+use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
@@ -7,6 +8,7 @@ use crate::vec3::Vec3;
 pub struct Sphere {
     pub center: Vec3,
     pub r: f64,
+    pub material: Box<dyn Material>,
 }
 
 impl Hittable for Sphere {
@@ -27,7 +29,7 @@ impl Hittable for Sphere {
                 return Miss;
             }
             let p = ray.at(root);
-            HitOrMiss::hit(p, (p - self.center) / self.r, root, ray)
+            HitOrMiss::hit(p, (p - self.center) / self.r, root, ray, &*self.material)
         };
     }
 }
