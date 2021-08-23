@@ -1,10 +1,21 @@
 # Rust Ray Tracing In One Weekend
 
 An attempt to translate [Ray Tracing In One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+into Rust.
+
+This is intended to scratch a couple of itches. I wanted a project which:
+
+- let me learn some Rust.
+- could produce something visual.
 
 ## Progress
 
-So far I have covered chapters 1-8 of the book. This means I can draw an image containing two diffuse spheres.
+So far I have covered chapters 1-9 of the book. This means I can draw an image containing two diffuse spheres and two
+metallic spheres. The result looks something like this:
+
+![A screenshot of the running application showing spheres composed of various materials](screenshot.png)
+
+Up next is dielectrics (e.g. glass).
 
 There are three books in [this series](https://raytracing.github.io/). I plan to finish at least the first book in the
 series, admittedly not in just one weekend.
@@ -21,17 +32,20 @@ enjoy the effect.
 
 ## Notes on Rust
 
-I have deviated from the exact approach shown in the book to use more idiomatic Rust.The main example is the use of Rust
-enums. The hit method in the book returned a boolean to indicate whether a hit occurred, and took in a pointer to a hit
-record to provide the information about the hit if there was one. In Rust, we can instead make use of an enum. We can
-return either a Hit or a Miss, and include the information about the hit in the Hit enum value. This ends up making the
-code for handling the result of this method quite nice.
+I have deviated from the exact approach shown in the book to try to use more idiomatic Rust.The main example is the use
+of Rust enums. The hit method in the book returned a boolean to indicate whether a hit occurred, and took in a pointer
+to a hit record to provide the information about the hit if there was one. In Rust, we can instead make use of an enum.
+We can return either a Hit or a Miss, and include the information about the hit in the Hit enum value. This ends up
+making the code for handling the result of this method quite nice.
 
 I have implemented various traits for a Vec3 struct to reflect the Vec3 class defined in the book. There are almost
-certainly more complete linear algebra crates out there, but this was a fun exercise to play with traits.
+certainly more complete linear algebra crates out there, but this was a fun exercise to play with traits. I also plan to
+use this module to learn how to write unit tests in Rust, since testing most of the vector operations should be
+straightforward.
 
 ## Performance
 
 I am not sure what performance I should expect from this code. I don't even know how long it takes for the C++ code in
-the book to produce an image. However, it certainly feels very slow. I am far from a Rust expert, and might have made
-some egregious performance fumbles in here somewhere.
+the book to produce an image. Performance improves considerably when compiled with cargo's `--release` option (as
+promised by the Rust docs). I am far from a Rust expert, and might have made some egregious performance fumbles in here
+somewhere.
