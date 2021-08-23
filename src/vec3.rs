@@ -57,7 +57,7 @@ impl Vec3 {
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
             let p = Vec3::random(-1.0, 1.0);
-            if p.magnitude().powi(2) >= 1.0 {
+            if p.norm() >= 1.0 {
                 continue;
             }
             return p;
@@ -66,6 +66,15 @@ impl Vec3 {
 
     pub fn random_unit_vector() -> Vec3 {
         Vec3::random_in_unit_sphere().normalize()
+    }
+
+    pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
+        let p = Vec3::random_in_unit_sphere();
+        if p.dot(normal) > 0.0 {
+            p
+        } else {
+            -p
+        }
     }
 }
 

@@ -29,7 +29,7 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: usize) -> Vec3 {
             // Normalize ensures all components in range [0.0,1.0],
             // + [1,1,1] ensures all are in range [1.0, 2.0]
             // 0.5 * => all in range [0.5,1.0]
-            let target = p + normal + Vec3::random_unit_vector();
+            let target = p + Vec3::random_in_hemisphere(&normal);
             0.5 * (ray_color(
                 &Ray {
                     origin: p,
