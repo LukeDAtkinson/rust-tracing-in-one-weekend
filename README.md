@@ -1,5 +1,7 @@
 # Rust Ray Tracing In One Weekend
 
+![A screenshot of the running application showing spheres composed of various materials](doc/screenshot-chapter-10.png)
+
 An attempt to translate [Ray Tracing In One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
 into Rust.
 
@@ -8,27 +10,37 @@ This is intended to scratch a couple of itches. I wanted a project which:
 - let me learn some Rust.
 - could produce something visual.
 
+## Development
+
+### Dependencies
+
+#### Rust
+
+Last successfully compiled and run using rust toolchain 1.54.0.
+
+#### SDL2
+
+Note that this uses [SDL2](https://github.com/Rust-SDL2/rust-sdl2) to display a window, draw pixels and display the
+result, rather than output the image data to stdout as described in the book. SDL2 requires some set up in your local
+environment before you can run this code. See the README of the linked SDL2 repository for installation instructions for
+various platforms.
+
+### Running
+
+`cargo run` will compile and run the code, but the rendering will be very slow.
+
+`cargo run --release` will render faster at the cost of a slower compilation time. I have found this almost always worth
+doing.
+
 ## Progress
 
 So far I have covered chapters 1-10 of the book. This means I can draw an image containing diffuse, metallic and
-dielectric spheres. The result looks something like this:
-
-![A screenshot of the running application showing spheres composed of various materials](doc/screenshot-chapter-10.png)
+dielectric spheres. The results can be seen above.
 
 Up next is a positionable camera.
 
 There are three books in [this series](https://raytracing.github.io/). I plan to finish at least the first book in the
 series, admittedly not in just one weekend.
-
-## SDL2
-
-Note that I am using [SDL2](https://github.com/Rust-SDL2/rust-sdl2) to display a window, draw pixels and display the
-result, rather than output the image data to stdout as described in the book. This was mostly just because I wanted to
-try out creating and drawing to a window in Rust. SDL2 requires some set up in your local environment before you can run
-this code. See the README of the linked SDL2 repository for installation instructions for various platforms.
-
-I present the canvas regularly during rendering in lieu of a progress bar. This might be bad for performance, but I
-enjoy the effect.
 
 ## Notes on Rust
 
@@ -49,6 +61,9 @@ I am not sure what performance I should expect from this code. I don't even know
 the book to produce an image. Performance improves considerably when compiled with cargo's `--release` option (as
 promised by the Rust docs). I am far from a Rust expert, and might have made some egregious performance fumbles in here
 somewhere.
+
+I present the canvas regularly during rendering in lieu of a progress bar. This might be bad for performance, but I
+enjoy the effect.
 
 ## Correctness
 
