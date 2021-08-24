@@ -28,7 +28,7 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: usize) -> Vec3 {
     };
     match world.hit(ray, 0.001, f64::INFINITY) {
         HitOrMiss::Hit {
-            p: _,
+            p,
             normal: _,
             scatter_result,
             ..
@@ -38,9 +38,19 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: usize) -> Vec3 {
             // 0.5 * => all in range [0.5,1.0]
             match scatter_result {
                 ScatterResult::Scattered {
-                    scattered_ray,
+                    scatter_direction,
                     attenuation,
-                } => attenuation * ray_color(&scattered_ray, world, depth - 1),
+                } => {
+                    attenuation
+                        * ray_color(
+                            &Ray {
+                                origin: p,
+                                direction: scatter_direction,
+                            },
+                            world,
+                            depth - 1,
+                        )
+                }
                 ScatterResult::Absorbed { .. } => Vec3::zero(),
             }
         }

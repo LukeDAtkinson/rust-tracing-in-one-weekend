@@ -34,7 +34,7 @@ impl HitOrMiss {
         } else {
             -outward_normal
         };
-        let scatter_result = material.scatter(ray, p, normal);
+        let scatter_result = material.scatter(ray, normal);
         Hit {
             p,
             normal,

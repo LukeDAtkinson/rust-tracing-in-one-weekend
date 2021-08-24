@@ -4,7 +4,7 @@ use crate::vec3::Vec3;
 /// The result of scattering a ray from a Material.
 pub enum ScatterResult {
     Scattered {
-        scattered_ray: Ray,
+        scatter_direction: Vec3,
         attenuation: Vec3,
     },
     Absorbed {},
@@ -13,7 +13,7 @@ pub enum ScatterResult {
 pub trait Material {
     /// Scatter a ray of a given attenuation that hit this Material according to the hit_record.
     /// Returns a ScatterResult.
-    fn scatter(&self, ray_in: &Ray, p: Vec3, normal: Vec3) -> ScatterResult;
+    fn scatter(&self, ray_in: &Ray, normal: Vec3) -> ScatterResult;
 }
 
 pub struct Lambertian {
@@ -27,17 +27,13 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, _ray_in: &Ray, p: Vec3, normal: Vec3) -> ScatterResult {
+    fn scatter(&self, _ray_in: &Ray, normal: Vec3) -> ScatterResult {
         let mut scatter_direction = normal + Vec3::random_unit_vector();
         if scatter_direction.near_zero() {
             scatter_direction = normal;
         }
-        let scattered = Ray {
-            origin: p,
-            direction: scatter_direction,
-        };
         ScatterResult::Scattered {
-            scattered_ray: scattered,
+            scatter_direction,
             attenuation: self.albedo,
         }
     }
@@ -54,19 +50,15 @@ impl UniformScatterer {
 }
 
 impl Material for UniformScatterer {
-    fn scatter(&self, _ray_in: &Ray, p: Vec3, normal: Vec3) -> ScatterResult {
+    fn scatter(&self, _ray_in: &Ray, normal: Vec3) -> ScatterResult {
         let mut scatter_direction = Vec3::random_in_hemisphere(&normal);
 
         // Prevent scatter direction being the zero vector, which can lead to infinities/NaNs.
         if scatter_direction.near_zero() {
             scatter_direction = normal;
         }
-        let scattered = Ray {
-            origin: p,
-            direction: scatter_direction,
-        };
         ScatterResult::Scattered {
-            scattered_ray: scattered,
+            scatter_direction,
             attenuation: self.albedo,
         }
     }
@@ -87,20 +79,21 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, ray_in: &Ray, p: Vec3, normal: Vec3) -> ScatterResult {
+    fn scatter(&self, ray_in: &Ray, normal: Vec3) -> ScatterResult {
         let v = ray_in.direction.normalize();
-        let reflected =
+        // Vector calculation for getting the reflected ray direction.
+        // Plus the random fuzz of the material
+        let scatter_direction =
             v - 2.0 * v.dot(&normal) * normal + (self.fuzz * Vec3::random_in_unit_sphere());
-        if reflected.dot(&normal) > 0.0 {
-            let scattered = Ray {
-                origin: p,
-                direction: reflected,
-            };
+        // If the reflected ray is pointing out, then the ray is reflected
+        if scatter_direction.dot(&normal) > 0.0 {
             ScatterResult::Scattered {
-                scattered_ray: scattered,
+                scatter_direction,
                 attenuation: self.albedo,
             }
-        } else {
+        }
+        // otherwise the ray is absorbed
+        else {
             ScatterResult::Absorbed {}
         }
     }
