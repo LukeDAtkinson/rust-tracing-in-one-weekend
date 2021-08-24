@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use rand::Rng;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -7,11 +8,14 @@ use sdl2::rect::Point;
 
 use crate::camera::Camera;
 use crate::hit::{HitOrMiss, Hittable, HittableList};
-use crate::material::{Lambertian, Metal, ScatterResult, UniformScatterer};
+use crate::material::dielectric::Dielectric;
+use crate::material::lambertian::Lambertian;
+use crate::material::metal::Metal;
+use crate::material::uniform_scatterer::UniformScatterer;
+use crate::material::ScatterResult;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::Vec3;
-use rand::Rng;
 
 #[macro_use]
 mod vec3;
@@ -107,31 +111,24 @@ fn main() {
     let mut event_pump = sdl_context.event_pump().unwrap();
 
     // Define our materials
-    let material_ground = Box::from(UniformScatterer::make(Vec3 {
+    let material_ground = Box::from(Lambertian::make(Vec3 {
         x: 0.8,
         y: 0.8,
         z: 0.0,
     }));
     let material_center = Box::from(Lambertian::make(Vec3 {
-        x: 0.7,
-        y: 0.3,
-        z: 0.3,
+        x: 0.1,
+        y: 0.2,
+        z: 0.5,
     }));
-    let material_left = Box::from(Metal::make(
-        Vec3 {
-            x: 0.8,
-            y: 0.8,
-            z: 0.8,
-        },
-        0.3,
-    ));
+    let material_left = Box::from(Dielectric::make(3.0));
     let material_right = Box::from(Metal::make(
         Vec3 {
             x: 0.8,
             y: 0.6,
             z: 0.2,
         },
-        1.0,
+        0.0,
     ));
 
     // Set up the game world

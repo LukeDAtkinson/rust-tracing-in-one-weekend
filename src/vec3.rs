@@ -24,6 +24,7 @@ impl Vec3 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
+    /// Create a vector in the same direction as this vector, but with magnitude 1.
     pub fn normalize(&self) -> Vec3 {
         let inv_mag = self.magnitude().recip();
         Vec3 {
