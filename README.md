@@ -10,12 +10,12 @@ This is intended to scratch a couple of itches. I wanted a project which:
 
 ## Progress
 
-So far I have covered chapters 1-9 of the book. This means I can draw an image containing two diffuse spheres and two
-metallic spheres. The result looks something like this:
+So far I have covered chapters 1-10 of the book. This means I can draw an image containing diffuse, metallic and
+dielectric spheres. The result looks something like this:
 
-![A screenshot of the running application showing spheres composed of various materials](screenshot.png)
+![A screenshot of the running application showing spheres composed of various materials](doc/screenshot-chapter-10.png)
 
-Up next is dielectrics (e.g. glass).
+Up next is a positionable camera.
 
 There are three books in [this series](https://raytracing.github.io/). I plan to finish at least the first book in the
 series, admittedly not in just one weekend.
@@ -49,3 +49,8 @@ I am not sure what performance I should expect from this code. I don't even know
 the book to produce an image. Performance improves considerably when compiled with cargo's `--release` option (as
 promised by the Rust docs). I am far from a Rust expert, and might have made some egregious performance fumbles in here
 somewhere.
+
+## Correctness
+
+I am unsure about the correctness of my dielectric material. My refractive index appears to be off from the book by a
+factor of 2, and I am struggling to reproduce the "hollow glass sphere" from chapter 10.5.
