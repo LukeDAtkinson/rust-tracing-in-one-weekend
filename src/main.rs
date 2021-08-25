@@ -84,14 +84,30 @@ fn vec_to_color(color_vec: Vec3, samples_per_pixel: usize) -> Color {
 const WIDTH: i32 = 600;
 const HEIGHT: i32 = (WIDTH as f64 / ASPECT_RATIO) as i32;
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const FOCAL_LENGTH: f64 = 1.0;
 const SAMPLES_PER_PIXEL: usize = 100;
 const MAX_DEPTH: usize = 50;
 
 fn main() {
     // Camera
-    let viewport_height = 2.0;
-    let camera = Camera::camera(ASPECT_RATIO, viewport_height, FOCAL_LENGTH, Vec3::zero());
+    let camera = Camera::camera(
+        Vec3 {
+            x: -2.0,
+            y: 2.0,
+            z: 1.0,
+        },
+        Vec3 {
+            x: 0.0,
+            y: 0.0,
+            z: -1.0,
+        },
+        Vec3 {
+            x: 0.0,
+            y: 1.0,
+            z: 0.0,
+        },
+        20.0,
+        ASPECT_RATIO,
+    );
 
     // Set up SDL to draw to screen
     let sdl_context = sdl2::init().unwrap();
@@ -111,7 +127,7 @@ fn main() {
     let mut event_pump = sdl_context.event_pump().unwrap();
 
     // Define our materials
-    let material_ground = Box::from(Lambertian::make(Vec3 {
+    let material_ground = Box::from(UniformScatterer::make(Vec3 {
         x: 0.8,
         y: 0.8,
         z: 0.0,
