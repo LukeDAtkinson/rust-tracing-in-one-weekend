@@ -82,6 +82,18 @@ impl Vec3 {
             -p
         }
     }
+
+    pub fn random_in_unit_disk() -> Vec3 {
+        let mut rng = rand::thread_rng();
+        loop {
+            let p = Vec3{
+                x: rng.gen_range(-1.0..1.0),
+                y: rng.gen_range(-1.0..1.0),
+                z: 0.0,
+            };
+            if p.norm() < 1.0 { return p; }
+        }
+    }
 }
 
 impl Add for Vec3 {

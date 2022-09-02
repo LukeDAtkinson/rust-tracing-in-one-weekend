@@ -47,13 +47,13 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: usize) -> Vec3 {
                 } => {
                     attenuation
                         * ray_color(
-                            &Ray {
-                                origin: p,
-                                direction: scatter_direction,
-                            },
-                            world,
-                            depth - 1,
-                        )
+                        &Ray {
+                            origin: p,
+                            direction: scatter_direction,
+                        },
+                        world,
+                        depth - 1,
+                    )
                 }
                 ScatterResult::Absorbed { .. } => Vec3::zero(),
             }
@@ -63,10 +63,10 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: usize) -> Vec3 {
             let t = 0.5 * (unit_direction.y + 1.0);
             (1.0 - t) * Vec3::from_one(1.0)
                 + t * Vec3 {
-                    x: 0.5,
-                    y: 0.7,
-                    z: 1.0,
-                }
+                x: 0.5,
+                y: 0.7,
+                z: 1.0,
+            }
         }
     }
 }
@@ -89,17 +89,19 @@ const MAX_DEPTH: usize = 50;
 
 fn main() {
     // Camera
+    let lookfrom = Vec3 {
+        x: 3.0,
+        y: 3.0,
+        z: 2.0,
+    };
+    let lookat = Vec3 {
+        x: 0.0,
+        y: 0.0,
+        z: -1.0,
+    };
     let camera = Camera::camera(
-        Vec3 {
-            x: -2.0,
-            y: 2.0,
-            z: 1.0,
-        },
-        Vec3 {
-            x: 0.0,
-            y: 0.0,
-            z: -1.0,
-        },
+        lookfrom,
+        lookat,
         Vec3 {
             x: 0.0,
             y: 1.0,
@@ -107,6 +109,8 @@ fn main() {
         },
         20.0,
         ASPECT_RATIO,
+        2.0,
+        (lookfrom - lookat).magnitude(),
     );
 
     // Set up SDL to draw to screen
