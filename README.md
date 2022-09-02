@@ -1,6 +1,6 @@
 # Rust Ray Tracing In One Weekend
 
-![A screenshot of the running application showing spheres composed of various materials](doc/screenshot-chapter-12.png)
+![A screenshot of the running application showing spheres composed of various materials](doc/screenshot-chapter-13.png)
 
 An attempt to translate Peter Shirley's [_Ray Tracing In One
 Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html) into Rust.
@@ -9,7 +9,6 @@ This is intended to scratch a couple of itches. I wanted a project which:
 
 - let me learn some Rust.
 - could produce something visual.
-
 ## Development
 
 ### Dependencies
@@ -34,12 +33,13 @@ doing.
 
 ## Progress
 
-So far I have covered chapters 1-12 of the book. This means I can draw an image containing diffuse, metallic and
+So far I have covered all chapters 1-13 of the book. This means I can draw an image containing diffuse, metallic and
 dielectric spheres, and control the position and orientation of the camera used to render the scene. The results can be
-seen above. I can also now simulate a lens, giving depth of field or "defocus blur" as the book calls it.
+seen above. I can also now simulate a lens, giving depth of field or "defocus blur" as the book calls it. Finally, I can
+generate a scene with a random scattering of spheres to render.
 
-There are three books in [this series](https://raytracing.github.io/). I plan to finish at least the first book in the
-series, admittedly not in just one weekend.
+There are three books in [this series](https://raytracing.github.io/). I may in future visit one of the later books in
+the series.
 
 ## Notes on Rust
 

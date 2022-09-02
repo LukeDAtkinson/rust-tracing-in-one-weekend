@@ -81,23 +81,23 @@ fn vec_to_color(color_vec: Vec3, samples_per_pixel: usize) -> Color {
 }
 
 // Image
-const WIDTH: i32 = 600;
+const WIDTH: i32 = 1200;
 const HEIGHT: i32 = (WIDTH as f64 / ASPECT_RATIO) as i32;
-const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const SAMPLES_PER_PIXEL: usize = 100;
+const ASPECT_RATIO: f64 = 3.0 / 2.0;
+const SAMPLES_PER_PIXEL: usize = 50;
 const MAX_DEPTH: usize = 50;
 
 fn main() {
     // Camera
     let lookfrom = Vec3 {
-        x: 3.0,
-        y: 3.0,
-        z: 2.0,
+        x: 13.0,
+        y: 2.0,
+        z: 3.0,
     };
     let lookat = Vec3 {
         x: 0.0,
         y: 0.0,
-        z: -1.0,
+        z: 0.0,
     };
     let camera = Camera::camera(
         lookfrom,
@@ -109,8 +109,8 @@ fn main() {
         },
         20.0,
         ASPECT_RATIO,
-        2.0,
-        (lookfrom - lookat).magnitude(),
+        0.1,
+        10.0,
     );
 
     // Set up SDL to draw to screen
@@ -130,65 +130,8 @@ fn main() {
     canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
-    // Define our materials
-    let material_ground = Box::from(UniformScatterer::make(Vec3 {
-        x: 0.8,
-        y: 0.8,
-        z: 0.0,
-    }));
-    let material_center = Box::from(Lambertian::make(Vec3 {
-        x: 0.1,
-        y: 0.2,
-        z: 0.5,
-    }));
-    let material_left = Box::from(Dielectric::make(3.0));
-    let material_right = Box::from(Metal::make(
-        Vec3 {
-            x: 0.8,
-            y: 0.6,
-            z: 0.2,
-        },
-        0.0,
-    ));
-
     // Set up the game world
-    let mut world = HittableList { hittables: vec![] };
-    world.hittables.push(Box::from(Sphere {
-        center: Vec3 {
-            x: 0.0,
-            y: 0.0,
-            z: -1.0,
-        },
-        r: 0.5,
-        material: material_center,
-    }));
-    world.hittables.push(Box::from(Sphere {
-        center: Vec3 {
-            x: 0.0,
-            y: -100.5,
-            z: -1.0,
-        },
-        r: 100.0,
-        material: material_ground,
-    }));
-    world.hittables.push(Box::from(Sphere {
-        center: Vec3 {
-            x: -1.0,
-            y: 0.0,
-            z: -1.0,
-        },
-        r: 0.5,
-        material: material_left,
-    }));
-    world.hittables.push(Box::from(Sphere {
-        center: Vec3 {
-            x: 1.0,
-            y: 0.0,
-            z: -1.0,
-        },
-        r: 0.5,
-        material: material_right,
-    }));
+    let world = random_scene();
 
     // Render with ray tracing
     'render: for j in 0..HEIGHT {
@@ -242,6 +185,99 @@ fn main() {
         }
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
+}
+
+fn random_scene() -> HittableList {
+    let mut world = HittableList { hittables: vec![] };
+
+    // Define our materials
+    let material_ground = UniformScatterer::make(Vec3 {
+        x: 0.5,
+        y: 0.5,
+        z: 0.5,
+    });
+    world.hittables.push(Box::from(Sphere {
+        center: Vec3 {
+            x: 0.0,
+            y: -1000.0,
+            z: 0.0,
+        },
+        r: 1000.0,
+        material: Box::from(material_ground),
+    }));
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = random_double();
+            let center = Vec3 {
+                x: a as f64 + 0.9 * random_double(),
+                y: 0.2,
+                z: b as f64 + 0.9 * random_double(),
+            };
+            let diff = Vec3 {
+                x: 4.0,
+                y: 0.2,
+                z: 0.0,
+            };
+            if (center - diff).magnitude() > 0.9 {
+                world.hittables.push(Box::from(Sphere {
+                    center,
+                    r: 0.2,
+                    material: match choose_mat {
+                        x if x < 0.8 => {
+                            // diffuse
+                            Box::from(Lambertian::make(Vec3::random(0.0, 1.0) * Vec3::random(0.0, 1.0)))
+                        }
+                        x if x >= 0.8 && x < 0.95 => {
+                            // metal
+                            Box::from(Metal::make(Vec3::random(0.5, 1.0), random_double() / 2.0))
+                        }
+                        _ => {
+                            // glass
+                            Box::from(Dielectric::make(1.5))
+                        }
+                    },
+                }));
+            }
+        }
+    }
+
+    world.hittables.push(Box::from(Sphere {
+        center: Vec3 {
+            x: 0.0,
+            y: 1.0,
+            z: 0.0,
+        },
+        r: 1.0,
+        material: Box::from(Dielectric::make(1.5)),
+    }));
+    world.hittables.push(Box::from(Sphere {
+        center: Vec3 {
+            x: -4.0,
+            y: 1.0,
+            z: 0.0,
+        },
+        r: 1.0,
+        material: Box::from(Lambertian::make(Vec3 {
+            x: 0.4,
+            y: 0.2,
+            z: 0.1,
+        })),
+    }));
+    world.hittables.push(Box::from(Sphere {
+        center: Vec3 {
+            x: 4.0,
+            y: 1.0,
+            z: 0.0,
+        },
+        r: 1.0,
+        material: Box::from(Metal::make(Vec3 {
+            x: 0.7,
+            y: 0.6,
+            z: 0.5,
+        }, 0.0)),
+    }));
+    world
 }
 
 // Returns a random number in [0,1)
